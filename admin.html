@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GIGI 作品集 · 后台管理面板</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #f5f5f7;
+    color: #1d1d1f;
+    line-height: 1.6;
+  }
+  header {
+    background: #1d1d1f;
+    color: white;
+    padding: 20px 40px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(0,0,0,.15);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  header h1 { font-size: 20px; font-weight: 600; }
+  header h1 span { color: #0066ff; }
+  .header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+  .btn {
+    padding: 9px 18px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all .2s;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .btn-primary { background: #0066ff; color: white; }
+  .btn-primary:hover { background: #0052cc; transform: translateY(-1px); }
+  .btn-secondary { background: #f5f5f7; color: #1d1d1f; border: 1px solid #d2d2d7; }
+  .btn-secondary:hover { background: #e8e8ed; }
+  .btn-success { background: #34c759; color: white; }
+  .btn-success:hover { background: #28a745; }
+  .btn-danger { background: #ff3b30; color: white; padding: 6px 12px; font-size: 12px; }
+  .btn-sm { padding: 5px 10px; font-size: 12px; border-radius: 6px; }
+  .btn-warning { background: #ff9500; color: white; }
+
+  main {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 30px 24px 80px;
+  }
+  .notice {
+    background: #fff3cd;
+    border-left: 4px solid #ffc107;
+    padding: 14px 18px;
+    border-radius: 6px;
+    margin-bottom: 24px;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #856404;
+  }
+  .notice strong { color: #856404; }
+
+  section.card {
+    background: white;
+    border-radius: 12px;
+    padding: 28px;
+    margin-bottom: 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.06);
+  }
+  section.card h2 {
+    font-size: 18px;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e8e8ed;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  section.card h2 .tag {
+    background: #0066ff;
+    color: white;
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 18px;
+  }
+  .form-item { display: flex; flex-direction: column; gap: 6px; }
+  .form-item.full { grid-column: 1 / -1; }
+  label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #6e6e73;
+  }
+  input[type=text], input[type=number], textarea {
+    padding: 10px 12px;
+    border: 1px solid #d2d2d7;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    transition: border .2s;
+    background: white;
+    width: 100%;
+  }
+  input:focus, textarea:focus {
+    outline: none;
+    border-color: #0066ff;
+    box-shadow: 0 0 0 3px rgba(0,102,255,.1);
+  }
+  textarea { resize: vertical; min-height: 80px; }
+
+  /* Stats */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 14px;
+  }
+  .stat-box {
+    border: 1px solid #e8e8ed;
+    border-radius: 10px;
+    padding: 16px;
+    background: #fafafa;
+  }
+  .stat-box input { text-align: center; font-size: 22px; font-weight: 700; }
+  .stat-box label { text-align: center; }
+
+  /* Clients & Awards */
+  .chip-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .chip {
+    background: #0066ff;
+    color: white;
+    padding: 7px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .chip button {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    opacity: .7;
+  }
+  .chip button:hover { opacity: 1; }
+  .add-row { display: flex; gap: 8px; }
+
+  /* Skills */
+  .skill-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+  .skill-tag {
+    background: #f5f5f7;
+    border: 1px solid #d2d2d7;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: grab;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .skill-tag.dragging { opacity: .4; }
+  .skill-tag input {
+    border: none;
+    background: transparent;
+    padding: 0;
+    font-size: 12px;
+    width: 80px;
+  }
+  .skill-tag input:focus {
+    outline: none;
+    box-shadow: none;
+    border-bottom: 1px solid #0066ff;
+  }
+  .skill-tag .del {
+    cursor: pointer;
+    color: #86868b;
+    font-weight: bold;
+  }
+  .skill-tag .del:hover { color: #ff3b30; }
+
+  /* Works */
+  .works-section { margin-bottom: 32px; }
+  .works-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .works-head h3 { font-size: 16px; color: #1d1d1f; }
+  .works-head .meta { font-size: 12px; color: #86868b; }
+
+  .work-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 14px;
+  }
+  .work-card {
+    border: 2px solid #e8e8ed;
+    border-radius: 10px;
+    padding: 14px;
+    background: white;
+    cursor: grab;
+    transition: all .2s;
+    position: relative;
+  }
+  .work-card:hover {
+    border-color: #0066ff;
+    box-shadow: 0 4px 12px rgba(0,102,255,.1);
+  }
+  .work-card.dragging { opacity: .4; }
+  .work-card.drag-over { border-color: #0066ff; background: #f0f6ff; }
+  .work-card .cover-preview {
+    width: 100%;
+    aspect-ratio: 4/3;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    background: #f0f0f0;
+    cursor: pointer;
+    border: 2px solid transparent;
+  }
+  .work-card .cover-preview:hover { border-color: #0066ff; }
+  .work-card .work-name {
+    width: 100%;
+    border: none;
+    border-bottom: 1px solid #e8e8ed;
+    padding: 6px 0;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  .work-card .work-name:focus {
+    box-shadow: none;
+    border-color: #0066ff;
+  }
+  .work-card .work-controls {
+    display: flex;
+    gap: 6px;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .work-card .cover-picker {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #e8e8ed;
+    border-radius: 10px;
+    padding: 14px;
+    z-index: 10;
+    box-shadow: 0 8px 24px rgba(0,0,0,.12);
+    max-height: 300px;
+    overflow-y: auto;
+  }
+  .work-card.cover-open .cover-picker { display: block; }
+  .cover-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+  }
+  .cover-grid img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 4px;
+    cursor: pointer;
+    border: 2px solid transparent;
+  }
+  .cover-grid img:hover { border-color: #0066ff; }
+  .cover-grid img.selected {
+    border-color: #0066ff;
+    box-shadow: 0 0 0 2px rgba(0,102,255,.3);
+  }
+  .cover-picker h4 { font-size: 12px; margin-bottom: 8px; color: #86868b; font-weight: 500; }
+
+  .drag-handle {
+    cursor: grab;
+    color: #c7c7cc;
+    font-size: 18px;
+    padding: 0 6px;
+  }
+
+  /* Image reordering in gallery */
+  .gallery-reorder {
+    margin-top: 16px;
+    padding: 16px;
+    border: 1px dashed #d2d2d7;
+    border-radius: 10px;
+    background: #fafafa;
+  }
+  .gallery-reorder h4 {
+    font-size: 13px;
+    margin-bottom: 12px;
+    color: #6e6e73;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .gallery-reorder h4 .hint { font-size: 11px; color: #86868b; font-weight: normal; }
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+  }
+  @media (max-width: 768px) {
+    .gallery-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+  .gallery-item {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: 6px;
+    overflow: hidden;
+    cursor: grab;
+    border: 2px solid transparent;
+    transition: all .15s;
+  }
+  .gallery-item:hover { border-color: #0066ff; transform: scale(1.03); }
+  .gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+  }
+  .gallery-item .index {
+    position: absolute;
+    bottom: 2px;
+    left: 2px;
+    background: rgba(0,0,0,.7);
+    color: white;
+    font-size: 10px;
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+  .gallery-item .reorder-badge {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background: #0066ff;
+    color: white;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-weight: bold;
+  }
+  .gallery-item.dragging { opacity: .4; }
+  .gallery-item.drag-over { border-color: #34c759; background: #eaffee; }
+  .gallery-item.is-cover::after {
+    content: "封面";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    background: #ff9500;
+    color: white;
+    font-size: 10px;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-weight: bold;
+  }
+
+  /* JSON Output */
+  .json-output {
+    background: #1d1d1f;
+    color: #f5f5f7;
+    padding: 18px;
+    border-radius: 8px;
+    font-family: "SF Mono", Consolas, monospace;
+    font-size: 12px;
+    max-height: 400px;
+    overflow: auto;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 18px;
+    border-bottom: 1px solid #e8e8ed;
+    flex-wrap: wrap;
+  }
+  .tab {
+    padding: 10px 18px;
+    border: none;
+    background: none;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    color: #6e6e73;
+    border-bottom: 2px solid transparent;
+    transition: all .2s;
+  }
+  .tab:hover { color: #1d1d1f; }
+  .tab.active {
+    color: #0066ff;
+    border-color: #0066ff;
+  }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  .collapsible {
+    background: #fafafa;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    overflow: hidden;
+    border: 1px solid #e8e8ed;
+  }
+  .collapsible-head {
+    padding: 12px 16px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 500;
+    font-size: 14px;
+    user-select: none;
+  }
+  .collapsible-head:hover { background: #f0f0f0; }
+  .collapsible-head .arrow { transition: transform .2s; font-size: 12px; }
+  .collapsible.open .arrow { transform: rotate(180deg); }
+  .collapsible-body { display: none; padding: 14px 16px; border-top: 1px solid #e8e8ed; }
+  .collapsible.open .collapsible-body { display: block; }
+
+  .hero-imgs-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+  .hero-img-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    background: #f5f5f7;
+    border: 1px solid #e8e8ed;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: grab;
+  }
+  .hero-img-chip.dragging { opacity: .4; }
+  .hero-img-chip.drag-over { border-color: #0066ff; background: #f0f6ff; }
+  .hero-img-chip img {
+    width: 32px;
+    height: 32px;
+    object-fit: cover;
+    border-radius: 4px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1><span>GIGI</span> 作品集 · 管理面板</h1>
+  <div class="header-actions">
+    <a href="/" target="_blank" class="btn btn-secondary">← 预览网站</a>
+    <button class="btn btn-secondary" onclick="exportJSON()">📥 导出 JSON</button>
+    <button class="btn btn-success" onclick="downloadZip()">💾 下载配置包</button>
+    <button class="btn btn-primary" onclick="applyAllToLocal()">⚡ 应用到本地</button>
+  </div>
+</header>
+
+<main>
+
+<div class="notice">
+  <strong>📌 使用说明：</strong><br>
+  1. 在本页面修改文字、拖拽排序、点击封面图换封面、拖拽图片调顺序<br>
+  2. 改完点顶部 <strong>「⚡ 应用到本地」</strong>，网站会立刻生效（刷新 localhost 看效果）<br>
+  3. 然后让我帮你上传到 GitHub Pages 永久网址
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab(this, 't-text')">📝 文字内容</button>
+  <button class="tab" onclick="switchTab(this, 't-works')">🖼️ 作品 & 封面</button>
+  <button class="tab" onclick="switchTab(this, 't-images')">📷 图片顺序</button>
+  <button class="tab" onclick="switchTab(this, 't-hero')">🎡 Hero 圆环</button>
+  <button class="tab" onclick="switchTab(this, 't-output')">📄 输出</button>
+</div>
+
+<!-- TAB 1: TEXT -->
+<div id="t-text" class="tab-content active">
+
+  <section class="card">
+    <h2>首屏 Hero <span class="tag">必填</span></h2>
+    <div class="form-grid">
+      <div class="form-item">
+        <label>姓名（小字）</label>
+        <input type="text" id="heroName" value="GIGI 卓晓雯">
+      </div>
+      <div class="form-item">
+        <label>身份标签</label>
+        <input type="text" id="heroTag" value="视觉设计师 · 产品设计师">
+      </div>
+      <div class="form-item">
+        <label>状态标签</label>
+        <input type="text" id="heroStatus" value="2026 接单中 · 深圳 / 远程协作">
+      </div>
+      <div class="form-item">
+        <label>标签关键词（逗号分隔）</label>
+        <input type="text" id="heroKws" value="平面设计, 品牌视觉, 产品包装">
+      </div>
+      <div class="form-item full">
+        <label>首屏简介</label>
+        <textarea id="heroIntro">GIGI 卓晓雯，来自深圳的视觉与产品设计师，擅长平面设计、视觉/交互设计、包装设计、海报设计与建模渲染，服务本土消费品牌与电商客户，打造既有质感、又能打动人心的视觉方案。</textarea>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>关于我</h2>
+    <div class="form-grid">
+      <div class="form-item full">
+        <label>关于我 · 个人介绍</label>
+        <textarea id="aboutIntro">来自深圳的视觉 / 产品设计师，3+ 年独立设计经验，100% 独立完成交付。服务本地消费品牌、电商客户与餐饮品牌，包括日日咖啡（品牌 VI 与物料系统）、广州琶洲灯光展康彩（产品视觉）、光影设计。作品获全国工业世界大赛二等奖。</textarea>
+      </div>
+    </div>
+
+    <h3 style="margin-top:24px; margin-bottom:14px; font-size:15px;">📊 数字统计</h3>
+    <div class="stats-row">
+      <div class="stat-box">
+        <label>交付项目数</label>
+        <input type="number" id="statProject" value="32">
+      </div>
+      <div class="stat-box">
+        <label>合作品牌数</label>
+        <input type="number" id="statBrand" value="6">
+      </div>
+      <div class="stat-box">
+        <label>从业年限</label>
+        <input type="number" id="statYear" value="3">
+      </div>
+      <div class="stat-box">
+        <label>独立完成率（%）</label>
+        <input type="number" id="statIndy" value="100">
+      </div>
+    </div>
+
+    <h3 style="margin-top:24px; margin-bottom:14px; font-size:15px;">🤝 合作过的品牌</h3>
+    <div id="clientsList" class="chip-list"></div>
+    <div class="add-row">
+      <input type="text" id="clientInput" placeholder="输入品牌名，如：日日咖啡" style="flex:1;">
+      <button class="btn btn-primary btn-sm" onclick="addClient()">添加</button>
+    </div>
+
+    <h3 style="margin-top:24px; margin-bottom:14px; font-size:15px;">🏆 获奖经历</h3>
+    <div id="awardsList" class="chip-list"></div>
+    <div class="add-row">
+      <input type="text" id="awardInput" placeholder="输入奖项，如：全国工业世界大赛二等奖" style="flex:1;">
+      <button class="btn btn-primary btn-sm" onclick="addAward()">添加</button>
+    </div>
+
+    <h3 style="margin-top:24px; margin-bottom:14px; font-size:15px;">🛠 技能标签（可拖拽排序、点 x 删除）</h3>
+    <div id="skillsList" class="skill-tags"></div>
+    <div class="add-row" style="margin-top:10px;">
+      <input type="text" id="skillInput" placeholder="输入技能，如：KeyShot" style="flex:1; max-width:200px;">
+      <button class="btn btn-primary btn-sm" onclick="addSkill()">添加技能</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>联系方式</h2>
+    <div class="form-grid">
+      <div class="form-item">
+        <label>邮箱</label>
+        <input type="text" id="contactEmail" value="gigigigi0924@foxmail.com">
+      </div>
+      <div class="form-item">
+        <label>微信</label>
+        <input type="text" id="contactWechat" value="WenW-kk">
+      </div>
+      <div class="form-item full">
+        <label>小红书链接</label>
+        <input type="text" id="contactXhs" value="https://www.xiaohongshu.com/user/profile/5ae7cf924eacab2dc741d10d">
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>各板块标题与副标题</h2>
+    <div class="form-grid">
+      <div class="form-item">
+        <label>电商作品集 · eyebrow</label>
+        <input type="text" id="secEcomBrow" value="电商作品集">
+      </div>
+      <div class="form-item">
+        <label>电商作品集 · 标题</label>
+        <input type="text" id="secEcomTitle" value="电商主图视觉">
+      </div>
+      <div class="form-item full">
+        <label>电商作品集 · 描述</label>
+        <textarea id="secEcomDesc">从主图到详情页，为电商产品打造高转化视觉语言。</textarea>
+      </div>
+      <div class="form-item">
+        <label>Product Poster · eyebrow</label>
+        <input type="text" id="secPpBrow" value="产品海报视觉">
+      </div>
+      <div class="form-item">
+        <label>Product Poster · 标题</label>
+        <input type="text" id="secPpTitle" value="Product Poster">
+      </div>
+      <div class="form-item full">
+        <label>Product Poster · 描述</label>
+        <textarea id="secPpDesc">单张海报视觉方案，突出产品卖点与品牌气质。</textarea>
+      </div>
+      <div class="form-item">
+        <label>VI设计 · eyebrow</label>
+        <input type="text" id="secViBrow" value="品牌 VI 设计">
+      </div>
+      <div class="form-item">
+        <label>VI设计 · 标题</label>
+        <input type="text" id="secViTitle" value="本土品牌视觉系统">
+      </div>
+      <div class="form-item full">
+        <label>VI设计 · 描述</label>
+        <textarea id="secViDesc">从 Logo 到物料，为本土消费品牌构建完整的视觉语言。</textarea>
+      </div>
+      <div class="form-item">
+        <label>海报设计 · eyebrow</label>
+        <input type="text" id="secPosterBrow" value="海报设计">
+      </div>
+      <div class="form-item">
+        <label>海报设计 · 标题</label>
+        <input type="text" id="secPosterTitle" value="活动视觉海报">
+      </div>
+      <div class="form-item full">
+        <label>海报设计 · 描述</label>
+        <textarea id="secPosterDesc">开业、周年庆、节日等场景的视觉海报设计。</textarea>
+      </div>
+      <div class="form-item">
+        <label>3D Product Tag · eyebrow</label>
+        <input type="text" id="secRenderBrow" value="建模渲染">
+      </div>
+      <div class="form-item">
+        <label>3D Product Tag · 标题</label>
+        <input type="text" id="secRenderTitle" value="三维产品渲染">
+      </div>
+      <div class="form-item full">
+        <label>3D Product Tag · 描述</label>
+        <textarea id="secRenderDesc">从建模到材质光影，为产品打造高品质三维渲染图。</textarea>
+      </div>
+      <div class="form-item">
+        <label>Logo Design · eyebrow</label>
+        <input type="text" id="secLogoBrow" value="Logo Design">
+      </div>
+      <div class="form-item">
+        <label>Logo Design · 标题</label>
+        <input type="text" id="secLogoTitle" value="品牌标志设计">
+      </div>
+      <div class="form-item full">
+        <label>Logo Design · 描述</label>
+        <textarea id="secLogoDesc">个人品牌与商业品牌的标志设计及变体。</textarea>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- TAB 2: WORKS -->
+<div id="t-works" class="tab-content">
+  <div id="worksContainer"></div>
+</div>
+
+<!-- TAB 3: IMAGE ORDER -->
+<div id="t-images" class="tab-content">
+  <div class="notice">
+    <strong>📷 调整作品内图片顺序：</strong>点击作品名展开该作品的所有图片，<strong>拖拽图片</strong>改变顺序，<strong>橙色"封面"标签</strong>的图是作品卡片封面。调完顺序后顶部点<strong>「⚡ 应用到本地」</strong>。
+  </div>
+  <div id="galleryReorderContainer"></div>
+</div>
+
+<!-- TAB 4: HERO RING -->
+<div id="t-hero" class="tab-content">
+  <section class="card">
+    <h2>🎡 Hero 3D 圆环图片（可拖拽排序）</h2>
+    <div class="notice">
+      <strong>提示：</strong>圆环上的图片决定了首屏的视觉。拖拽调整顺序，左边是正面的图片，右边是转到背面的图片。
+    </div>
+    <div id="heroImgsList" class="hero-imgs-row"></div>
+  </section>
+</div>
+
+<!-- TAB 5: OUTPUT -->
+<div id="t-output" class="tab-content">
+  <section class="card">
+    <h2>📄 当前配置 JSON（可复制发给 AI 助手）</h2>
+    <p style="margin-bottom:12px; font-size:13px; color:#6e6e73;">下面是你所有改动的配置文件，可以复制整个内容发给我，或者点顶部 <strong>📥 导出 JSON</strong> 下载文件。</p>
+    <pre class="json-output" id="jsonOut">{}</pre>
+  </section>
+</div>
+
+</main>
+
+<script>
+/* ========= 全局状态 ========= */
+const STATE = {
+  clients: [],
+  awards: [],
+  skills: [],
+  works: {}, // {ecom: [{name, coverIdx, imgOrder:[...]}, ...], vi: [...], poster: [...], pposter: [...], render: [...], logo: [...]}
+  heroImgOrder: []
+};
+
+const SECTIONS = [
+  {key:'ecom',   name:'电商作品集',  api:'/api/works',  prefix:'/img?n=',  hasGroup:true},
+  {key:'pposter',name:'Product Poster', api:'/api/pposter', prefix:'/pposter-img?n=', hasGroup:false},
+  {key:'vi',     name:'品牌 VI 设计', api:'/api/vi',     prefix:'/vi-img?n=', hasGroup:false},
+  {key:'poster', name:'海报设计',    api:'/api/poster', prefix:'/poster-img?n=', hasGroup:false},
+  {key:'render', name:'3D Product Tag', api:'/api/render', prefix:'/render-img?n=', hasGroup:false},
+  {key:'logo',   name:'Logo Design', api:'/api/logo',   prefix:'/logo-img?n=', hasGroup:false}
+];
+
+/* ========= 初始化 ========= */
+(async function init(){
+  await loadDefaults();
+  renderClients();
+  renderAwards();
+  renderSkills();
+  await loadWorksData();
+  renderWorksTab();
+  renderGalleryReorderTab();
+  renderHeroImgs();
+  setInterval(updateJsonOutput, 500);
+})();
+
+/* ========= 默认值（从 index.html 读取真实内容）========= */
+async function loadDefaults(){
+  try{
+    const r = await fetch('/');
+    const html = await r.text();
+    // 从 index.html 抓一些默认值
+    // hero 名
+    const hn = html.match(/<span>(GIGI.*?)<\/span>/);
+    if(hn) document.getElementById('heroName').value = hn[1];
+    // 介绍
+    const intro = html.match(/designer(?:<br>)?([\s\S]*?)<\/p><\/div><div class="hero-cols">/);
+    if(intro) document.getElementById('heroIntro').value = intro[1].replace(/<[^>]+>/g,'').trim();
+  }catch(e){}
+  // 默认 clients
+  STATE.clients = ['广州琶洲灯光展-康彩','日日咖啡','光影设计'];
+  // 默认 awards
+  STATE.awards = ['全国工业世界大赛 二等奖'];
+  // 默认 skills
+  STATE.skills = ['3DMAX','KeyShot','Photoshop','Illustrator','Rhino 3D','SolidWorks','品牌系统','电商视觉','三维渲染'];
+  // 默认 heroImgOrder
+  STATE.heroImgOrder = [
+    'hero2.png','hero4.png','hero5.png','hero6.png','hero7.png',
+    'hero10.png','hero11.jpg','hero12.jpg','hero13.jpg','hero14.png'
+  ];
+}
+
+/* ========= Clients ========= */
+function renderClients(){
+  const el = document.getElementById('clientsList');
+  el.innerHTML = '';
+  STATE.clients.forEach((c,i)=>{
+    el.insertAdjacentHTML('beforeend',
+      `<span class="chip">${esc(c)}<button onclick="removeClient(${i})">×</button></span>`);
+  });
+}
+function addClient(){
+  const v = document.getElementById('clientInput').value.trim();
+  if(v){ STATE.clients.push(v); renderClients(); document.getElementById('clientInput').value=''; }
+}
+function removeClient(i){ STATE.clients.splice(i,1); renderClients(); }
+
+/* ========= Awards ========= */
+function renderAwards(){
+  const el = document.getElementById('awardsList');
+  el.innerHTML = '';
+  STATE.awards.forEach((a,i)=>{
+    el.insertAdjacentHTML('beforeend',
+      `<span class="chip" style="background:#ff9500">🏆 ${esc(a)}<button onclick="removeAward(${i})">×</button></span>`);
+  });
+}
+function addAward(){
+  const v = document.getElementById('awardInput').value.trim();
+  if(v){ STATE.awards.push(v); renderAwards(); document.getElementById('awardInput').value=''; }
+}
+function removeAward(i){ STATE.awards.splice(i,1); renderAwards(); }
+
+/* ========= Skills ========= */
+function renderSkills(){
+  const el = document.getElementById('skillsList');
+  el.innerHTML = '';
+  STATE.skills.forEach((s,i)=>{
+    const div = document.createElement('div');
+    div.className = 'skill-tag';
+    div.draggable = true;
+    div.dataset.idx = i;
+    div.innerHTML = `
+      <span>⋮⋮</span>
+      <input value="${esc(s)}" onchange="STATE.skills[${i}]=this.value">
+      <span class="del" onclick="removeSkill(${i})">✕</span>
+    `;
+    attachDnD(div, STATE.skills, (arr)=>{ STATE.skills = arr; renderSkills(); });
+    el.appendChild(div);
+  });
+}
+function addSkill(){
+  const v = document.getElementById('skillInput').value.trim();
+  if(v){ STATE.skills.push(v); renderSkills(); document.getElementById('skillInput').value=''; }
+}
+function removeSkill(i){ STATE.skills.splice(i,1); renderSkills(); }
+
+/* ========= Works Data ========= */
+async function loadWorksData(){
+  for(const sec of SECTIONS){
+    try{
+      const r = await fetch(sec.api);
+      const data = await r.json();
+      STATE.works[sec.key] = data.map((w, idx) => {
+        // 把所有图片都拍平
+        let allImgs = [];
+        if(w.groups){ w.groups.forEach(g=>{ allImgs = allImgs.concat(g.images); }); }
+        else if(w.cover){ allImgs = [w.cover]; }
+        // 找封面在 allImgs 中的位置 (默认 0)
+        let coverIdx = 0;
+        if(w.cover && allImgs.indexOf(w.cover) >= 0) coverIdx = allImgs.indexOf(w.cover);
+        return {
+          name: w.name,
+          coverIdx: coverIdx,
+          imgOrder: allImgs.map((_, i)=> i), // 原始顺序
+          allImgs: allImgs,
+          prefix: sec.prefix,
+          sectionKey: sec.key,
+          sectionIdx: idx
+        };
+      });
+    }catch(e){ STATE.works[sec.key] = []; }
+  }
+}
+
+/* ========= Works 排序 + 封面 ========= */
+function renderWorksTab(){
+  const container = document.getElementById('worksContainer');
+  container.innerHTML = '';
+  SECTIONS.forEach(sec=>{
+    const works = STATE.works[sec.key] || [];
+    const div = document.createElement('div');
+    div.className = 'works-section';
+    div.innerHTML = `
+      <div class="works-head">
+        <h3>📂 ${sec.name}</h3>
+        <span class="meta">共 ${works.length} 个作品 · 拖拽卡片排序</span>
+      </div>
+      <div class="work-cards" data-section="${sec.key}"></div>
+    `;
+    const grid = div.querySelector('.work-cards');
+    works.forEach((w, i)=>{
+      const card = document.createElement('div');
+      card.className = 'work-card';
+      card.draggable = true;
+      card.dataset.idx = i;
+      const coverSrc = w.allImgs.length ? w.allImgs[w.imgOrder[w.coverIdx]] : '';
+      card.innerHTML = `
+        <span class="drag-handle">☰</span>
+        <img class="cover-preview" src="${coverSrc}" alt="封面" onclick="toggleCoverPicker(this.closest('.work-card'))">
+        <input class="work-name" type="text" value="${esc(w.name)}"
+          onchange="STATE.works['${sec.key}'][${i}].name=this.value; updateJsonOutput();">
+        <div class="work-controls">
+          <span style="font-size:11px; color:#86868b;">${w.allImgs.length} 张图 · 封面 #${w.coverIdx+1}</span>
+        </div>
+        <div class="cover-picker" onclick="event.stopPropagation()">
+          <h4>选择封面图（点击设为封面）</h4>
+          <div class="cover-grid">
+            ${w.allImgs.map((src, j)=> `
+              <img src="${src}" class="${w.coverIdx===w.imgOrder[j] ? 'selected':''}"
+                onclick="setCover('${sec.key}',${i},${j});">
+            `).join('')}
+          </div>
+        </div>
+      `;
+      attachDnD(card, works, (arr)=>{
+        STATE.works[sec.key] = arr;
+        renderWorksTab();
+        renderGalleryReorderTab();
+      });
+      grid.appendChild(card);
+    });
+    container.appendChild(div);
+  });
+}
+function toggleCoverPicker(card){
+  document.querySelectorAll('.work-card.cover-open').forEach(c=>{ if(c!==card) c.classList.remove('cover-open'); });
+  card.classList.toggle('cover-open');
+}
+function setCover(secKey, i, j){
+  // j 是 allImgs 下标，找到 imgOrder 里哪个位置对应 j，然后把 coverIdx 设为那个位置
+  const w = STATE.works[secKey][i];
+  const posInOrder = w.imgOrder.indexOf(j);
+  if(posInOrder >= 0){ w.coverIdx = posInOrder; }
+  renderWorksTab();
+  renderGalleryReorderTab();
+}
+
+/* ========= Gallery Image Reorder ========= */
+function renderGalleryReorderTab(){
+  const container = document.getElementById('galleryReorderContainer');
+  container.innerHTML = '';
+  SECTIONS.forEach(sec=>{
+    const works = STATE.works[sec.key] || [];
+    if(works.length === 0) return;
+    works.forEach((w, i)=>{
+      const col = document.createElement('div');
+      col.className = 'collapsible';
+      col.innerHTML = `
+        <div class="collapsible-head" onclick="this.closest('.collapsible').classList.toggle('open')">
+          <span>📁 ${sec.name} → ${esc(w.name)} <span style="color:#86868b; font-weight:normal;">（${w.allImgs.length} 张）</span></span>
+          <span class="arrow">▼</span>
+        </div>
+        <div class="collapsible-body">
+          <div class="gallery-reorder">
+            <h4>拖拽图片调整顺序 <span class="hint">橙色=封面，蓝色数字=当前显示顺序</span></h4>
+            <div class="gallery-grid" data-section="${sec.key}" data-idx="${i}"></div>
+          </div>
+        </div>
+      `;
+      const grid = col.querySelector('.gallery-grid');
+      w.imgOrder.forEach((origIdx, orderPos)=>{
+        const item = document.createElement('div');
+        item.className = 'gallery-item' + (orderPos === w.coverIdx ? ' is-cover' : '');
+        item.draggable = true;
+        item.dataset.order = orderPos;
+        item.innerHTML = `
+          <img src="${w.allImgs[origIdx]}">
+          <span class="index">#${orderPos+1}</span>
+        `;
+        attachGalleryDnD(item, w);
+        grid.appendChild(item);
+      });
+      container.appendChild(col);
+    });
+  });
+}
+
+/* ========= Hero 圆环图片 ========= */
+function renderHeroImgs(){
+  const el = document.getElementById('heroImgsList');
+  el.innerHTML = '';
+  STATE.heroImgOrder.forEach((f, i)=>{
+    const chip = document.createElement('div');
+    chip.className = 'hero-img-chip';
+    chip.draggable = true;
+    chip.dataset.idx = i;
+    chip.innerHTML = `
+      <img src="hero-imgs/${f}">
+      <span>#${i+1} ${f}</span>
+      <button class="btn-danger btn-sm" style="margin-left:4px;" onclick="removeHeroImg(${i})">✕</button>
+    `;
+    attachDnD(chip, STATE.heroImgOrder, (arr)=>{ STATE.heroImgOrder = arr; renderHeroImgs(); });
+    el.appendChild(chip);
+  });
+}
+function removeHeroImg(i){ STATE.heroImgOrder.splice(i,1); renderHeroImgs(); }
+
+/* ========= Drag and Drop Helpers ========= */
+function attachDnD(el, arr, onDone){
+  el.addEventListener('dragstart', (e)=>{
+    e.dataTransfer.setData('text/plain', el.dataset.idx);
+    el.classList.add('dragging');
+  });
+  el.addEventListener('dragend', ()=> el.classList.remove('dragging'));
+  el.addEventListener('dragover', (e)=>{ e.preventDefault(); el.classList.add('drag-over'); });
+  el.addEventListener('dragleave', ()=> el.classList.remove('drag-over'));
+  el.addEventListener('drop', (e)=>{
+    e.preventDefault();
+    el.classList.remove('drag-over');
+    const from = parseInt(e.dataTransfer.getData('text/plain'));
+    const to = parseInt(el.dataset.idx);
+    if(isNaN(from) || from===to) return;
+    const newArr = [...arr];
+    const [moved] = newArr.splice(from,1);
+    newArr.splice(to, 0, moved);
+    onDone(newArr);
+  });
+}
+function attachGalleryDnD(item, work){
+  item.addEventListener('dragstart', (e)=>{
+    e.dataTransfer.setData('text/plain', item.dataset.order);
+    item.classList.add('dragging');
+  });
+  item.addEventListener('dragend', ()=> item.classList.remove('dragging'));
+  item.addEventListener('dragover', (e)=>{ e.preventDefault(); item.classList.add('drag-over'); });
+  item.addEventListener('dragleave', ()=> item.classList.remove('drag-over'));
+  item.addEventListener('drop', (e)=>{
+    e.preventDefault();
+    item.classList.remove('drag-over');
+    const fromOrder = parseInt(e.dataTransfer.getData('text/plain'));
+    const toOrder = parseInt(item.dataset.order);
+    if(isNaN(fromOrder) || fromOrder===toOrder) return;
+    const newOrder = [...work.imgOrder];
+    const [moved] = newOrder.splice(fromOrder,1);
+    newOrder.splice(toOrder, 0, moved);
+    // 封面也要跟着移动：如果封面位置被移动
+    let newCoverIdx = work.coverIdx;
+    if(fromOrder === work.coverIdx) newCoverIdx = toOrder;
+    else if(fromOrder < work.coverIdx && toOrder >= work.coverIdx) newCoverIdx = work.coverIdx - 1;
+    else if(fromOrder > work.coverIdx && toOrder <= work.coverIdx) newCoverIdx = work.coverIdx + 1;
+    work.imgOrder = newOrder;
+    work.coverIdx = newCoverIdx;
+    renderWorksTab();
+    renderGalleryReorderTab();
+  });
+}
+
+/* ========= Tabs ========= */
+function switchTab(btn, id){
+  document.querySelectorAll('.tab').forEach(t=> t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t=> t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(id).classList.add('active');
+}
+
+/* ========= Output ========= */
+function collectConfig(){
+  return {
+    text: {
+      heroName: document.getElementById('heroName').value,
+      heroTag: document.getElementById('heroTag').value,
+      heroStatus: document.getElementById('heroStatus').value,
+      heroKws: document.getElementById('heroKws').value,
+      heroIntro: document.getElementById('heroIntro').value,
+      aboutIntro: document.getElementById('aboutIntro').value,
+      statProject: document.getElementById('statProject').value,
+      statBrand: document.getElementById('statBrand').value,
+      statYear: document.getElementById('statYear').value,
+      statIndy: document.getElementById('statIndy').value,
+      clients: STATE.clients,
+      awards: STATE.awards,
+      skills: STATE.skills,
+      contactEmail: document.getElementById('contactEmail').value,
+      contactWechat: document.getElementById('contactWechat').value,
+      contactXhs: document.getElementById('contactXhs').value,
+      sections: {
+        ecom: { b: document.getElementById('secEcomBrow').value, t: document.getElementById('secEcomTitle').value, d: document.getElementById('secEcomDesc').value },
+        pposter: { b: document.getElementById('secPpBrow').value, t: document.getElementById('secPpTitle').value, d: document.getElementById('secPpDesc').value },
+        vi: { b: document.getElementById('secViBrow').value, t: document.getElementById('secViTitle').value, d: document.getElementById('secViDesc').value },
+        poster: { b: document.getElementById('secPosterBrow').value, t: document.getElementById('secPosterTitle').value, d: document.getElementById('secPosterDesc').value },
+        render: { b: document.getElementById('secRenderBrow').value, t: document.getElementById('secRenderTitle').value, d: document.getElementById('secRenderDesc').value },
+        logo: { b: document.getElementById('secLogoBrow').value, t: document.getElementById('secLogoTitle').value, d: document.getElementById('secLogoDesc').value }
+      }
+    },
+    works: (()=>{
+      const out = {};
+      SECTIONS.forEach(sec=>{
+        out[sec.key] = (STATE.works[sec.key]||[]).map(w=>({
+          name: w.name,
+          coverIdx: w.coverIdx,
+          imgOrder: w.imgOrder,
+          origAllImgs: w.allImgs,
+          sectionIdx: w.sectionIdx
+        }));
+      });
+      return out;
+    })(),
+    heroImgOrder: STATE.heroImgOrder,
+    _version: 1
+  };
+}
+function updateJsonOutput(){
+  document.getElementById('jsonOut').textContent = JSON.stringify(collectConfig(), null, 2);
+}
+function exportJSON(){
+  const cfg = collectConfig();
+  const blob = new Blob([JSON.stringify(cfg,null,2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'gigi-portfolio-config.json';
+  a.click();
+  alert('✅ 已导出 gigi-portfolio-config.json，把这个文件发给 AI 助手即可');
+}
+async function downloadZip(){
+  alert('⚠️ 暂时不支持下载 ZIP，请用「📥 导出 JSON」下载配置文件。要应用改动，点「⚡ 应用到本地」即可立即生效。');
+}
+
+/* ========= Apply to local POST request to serve.ps1 custom endpoint ========= */
+async function applyAllToLocal(){
+  if(!confirm('确定要把所有改动应用到本地网站吗？改动会立刻生效（localhost）。')) return;
+  const btn = event.target;
+  btn.disabled = true; btn.textContent = '⏳ 应用中...';
+  try{
+    const cfg = collectConfig();
+    const r = await fetch('/admin-apply', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(cfg)
+    });
+    const txt = await r.text();
+    if(r.ok){
+      alert('✅ 成功！\n\n请打开 http://localhost:5173/ 按 Ctrl+Shift+R 刷新看效果。\n\n满意之后再让我上传到 GitHub Pages 永久网址。');
+    } else {
+      alert('❌ 应用失败：\n' + txt);
+    }
+  }catch(e){
+    alert('❌ 网络错误：' + e.message + '\n\n确保本地服务器在运行（localhost:5173）。');
+  }finally{
+    btn.disabled = false; btn.textContent = '⚡ 应用到本地';
+  }
+}
+
+/* ========= Utils ========= */
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+/* Click outside to close cover picker */
+document.addEventListener('click', (e)=>{
+  if(!e.target.closest('.work-card')){
+    document.querySelectorAll('.work-card.cover-open').forEach(c=> c.classList.remove('cover-open'));
+  }
+});
+</script>
+</body>
+</html>
